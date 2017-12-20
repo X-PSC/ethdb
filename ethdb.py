@@ -17,7 +17,7 @@ class Transaction():
         return str(self.value) + " from " + self.source + " to " + self.destination
 
 
-def load_db(filename = "../transactions.db", nb=100000):
+def load_db(filename = "../transactions_last.db", nb=100000):
     connection = sqlite3.connect(filename)
     cursor = connection.cursor()
 
@@ -28,3 +28,20 @@ def load_db(filename = "../transactions.db", nb=100000):
         res.append( Transaction(*t) )
 
     return res
+
+
+def load_db_source(source, filename = "../transactions_last.db", nb=100000):
+    connection = sqlite3.connect(filename)
+    cursor = connection.cursor()
+
+    l = cursor.execute(
+        """SELECT id, blockHash, blockNumber, "from", "to", value FROM transactions WHERE "from" = %s ORDER BY id DESC LIMIT %d""" %(source, nb)).fetchall()
+    res = []
+
+    for t in l:
+        res.append(Transaction(*t))
+
+    return res
+
+# TODO fun neighbors(Source) -> Transaction list
+# TODO fun build_graph_from_source(Source)
